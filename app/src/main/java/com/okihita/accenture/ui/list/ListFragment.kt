@@ -25,12 +25,15 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentListBinding.bind(view)
 
-        binding.list.setOnClickListener {
-            findNavController().navigate(R.id.action_listFragment_to_detailsFragment)
+        binding.btSearch.setOnClickListener {
+            val searchQuery = binding.etSearchQuery.text.toString()
+            searchUser(searchQuery)
         }
+    }
 
+    private fun searchUser(searchQuery: String) {
         lifecycleScope.launch {
-            binding.list.text = api.getUsers("hello").users.joinToString { it.login }
+            binding.tvList.text = api.getUsers(searchQuery).users.joinToString { it.login }
         }
     }
 
