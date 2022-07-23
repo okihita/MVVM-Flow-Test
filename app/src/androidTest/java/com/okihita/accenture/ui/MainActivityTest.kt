@@ -21,10 +21,6 @@ internal class MainActivityTest {
 
     @Test
     fun onMainActivityLaunch_searchElementsShown() {
-        onView(withId(R.id.clMain))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.tvList))
-            .check(matches(isDisplayed()))
         onView(withId(R.id.etSearchQuery))
             .check(matches(isDisplayed()))
         onView(withId(R.id.btSearch))

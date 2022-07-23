@@ -2,8 +2,10 @@ package com.okihita.accenture.ui.list
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.okihita.accenture.R
 import com.okihita.accenture.databinding.FragmentListBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,12 +22,18 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentListBinding.bind(view)
 
+        val adapter = GitHubUsersAdapter {
+            findNavController().navigate(R.id.action_listFragment_to_detailsFragment)
+        }
+        binding.rvUsers.adapter = adapter
+
         listVM.users.observe(viewLifecycleOwner) { users ->
-            binding.tvList.text = users.joinToString { user -> user.login }
+            binding.pbLoading.visibility = View.GONE
+            adapter.submitData(users)
         }
 
         binding.btSearch.setOnClickListener {
-            binding.tvList.text = "Loading..."
+            binding.pbLoading.visibility = View.VISIBLE
             val searchQuery = binding.etSearchQuery.text.toString()
             listVM.searchUsers(searchQuery)
         }
