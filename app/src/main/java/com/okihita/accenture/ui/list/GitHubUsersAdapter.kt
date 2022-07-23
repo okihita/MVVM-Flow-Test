@@ -2,6 +2,8 @@ package com.okihita.accenture.ui.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.okihita.accenture.data.model.GitHubUser
@@ -9,15 +11,7 @@ import com.okihita.accenture.databinding.ItemUserBinding
 
 class GitHubUsersAdapter(
     val onItemClick: (GitHubUser) -> Unit
-) : RecyclerView.Adapter<GitHubUsersAdapter.GitHubUserVH>() {
-
-    private var users: MutableList<GitHubUser> = mutableListOf()
-
-    fun submitData(newUsers: List<GitHubUser>) {
-        this.users.clear()
-        users.addAll(newUsers)
-        notifyDataSetChanged()
-    }
+) : PagingDataAdapter<GitHubUser, GitHubUsersAdapter.GitHubUserVH>(UserComparator) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GitHubUserVH {
         val view = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -25,12 +19,9 @@ class GitHubUsersAdapter(
     }
 
     override fun onBindViewHolder(holder: GitHubUserVH, position: Int) {
-        val user = users[position]
-        holder.bind(user)
-    }
-
-    override fun getItemCount(): Int {
-        return users.size
+        getItem(position)?.let { user ->
+            holder.bind(user)
+        }
     }
 
     inner class GitHubUserVH(private val binding: ItemUserBinding) :
@@ -43,6 +34,16 @@ class GitHubUsersAdapter(
             binding.root.setOnClickListener {
                 onItemClick(user)
             }
+        }
+    }
+
+    object UserComparator : DiffUtil.ItemCallback<GitHubUser>() {
+        override fun areItemsTheSame(oldItem: GitHubUser, newItem: GitHubUser): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: GitHubUser, newItem: GitHubUser): Boolean {
+            return oldItem == newItem
         }
     }
 }
