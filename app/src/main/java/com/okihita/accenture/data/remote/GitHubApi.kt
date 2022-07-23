@@ -19,5 +19,4 @@ interface GitHubApi {
     suspend fun getUserById(
         @Path("userId") userId: Int,
     ): GitHubUser
-
 }

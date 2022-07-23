@@ -21,7 +21,7 @@ class ListViewModel @Inject constructor(private val api: GitHubApi) : ViewModel(
             try {
                 _users.value = api.getUsers(searchQuery).users
             } catch (exception: Exception) {
-
+                exception.printStackTrace()
             }
         }
     }
