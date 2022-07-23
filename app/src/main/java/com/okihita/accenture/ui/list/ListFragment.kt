@@ -2,7 +2,6 @@ package com.okihita.accenture.ui.list
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,7 +22,8 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         _binding = FragmentListBinding.bind(view)
 
         val adapter = GitHubUsersAdapter {
-            findNavController().navigate(R.id.action_listFragment_to_detailsFragment)
+            val navAction = ListFragmentDirections.actionListFragmentToDetailsFragment(it.id)
+            findNavController().navigate(navAction)
         }
         binding.rvUsers.adapter = adapter
 

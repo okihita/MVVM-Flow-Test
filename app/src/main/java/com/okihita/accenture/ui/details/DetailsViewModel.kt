@@ -1,4 +1,4 @@
-package com.okihita.accenture.ui.list
+package com.okihita.accenture.ui.details
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,15 +11,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ListViewModel @Inject constructor(private val api: GitHubApi) : ViewModel() {
+class DetailsViewModel @Inject constructor(private val api: GitHubApi) : ViewModel() {
 
-    private val _users = MutableLiveData<List<GitHubUser>>()
-    val users: LiveData<List<GitHubUser>> = _users
+    private val _user = MutableLiveData<GitHubUser>()
+    val user: LiveData<GitHubUser> = _user
 
-    fun searchUsers(searchQuery: String) {
+    fun getProfile(userId: Int) {
         viewModelScope.launch {
             try {
-                _users.value = api.getUsers(searchQuery).users
+                _user.value = api.getUserById(userId)
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
