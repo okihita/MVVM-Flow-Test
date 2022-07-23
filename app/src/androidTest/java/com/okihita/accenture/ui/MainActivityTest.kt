@@ -1,13 +1,14 @@
 package com.okihita.accenture.ui
 
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.MediumTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.okihita.accenture.R
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -15,16 +16,18 @@ import org.junit.runner.RunWith
 @MediumTest
 internal class MainActivityTest {
 
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
     @Test
     fun onMainActivityLaunch_searchElementsShown() {
-        ActivityScenario.launch(MainActivity::class.java)
-        Espresso.onView(withId(R.id.clMain))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(withId(R.id.tvList))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(withId(R.id.etSearchQuery))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        Espresso.onView(withId(R.id.btSearch))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(withId(R.id.clMain))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.tvList))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.etSearchQuery))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.btSearch))
+            .check(matches(isDisplayed()))
     }
 }
