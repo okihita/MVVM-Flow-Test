@@ -47,6 +47,11 @@ class FooterLoadStateAdapter(
                             tvAppendError.setOnClickListener { retry() }
                         }
                     }
+
+                    if (it.endOfPaginationReached) {
+                        tvAppendError.text =
+                            root.context.getString(R.string.listFragment_noMoreResult)
+                    }
                 }
             }
         }

@@ -48,7 +48,7 @@ class GitHubUserDatabaseTest {
     @Test
     fun saveUsers_loadUsers_returnResult() = runBlocking {
         val users = generateUsers(15)
-        userDao.addUsers(users)
+        userDao.insertAll(users)
 
         val dbUsers = userDao.getAllUsers()
 

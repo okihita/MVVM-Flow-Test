@@ -18,9 +18,12 @@ object DatabaseModule {
     @Provides
     fun provideRoomDatabase(
         @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context,
-        GitHubUserDatabase::class.java,
-        "github_users_db"
-    ).build()
+    ) = Room
+        .databaseBuilder(
+            context,
+            GitHubUserDatabase::class.java,
+            "github_users_db"
+        )
+        .fallbackToDestructiveMigration()
+        .build()
 }

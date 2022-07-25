@@ -8,8 +8,8 @@
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/ivAvatar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars" />

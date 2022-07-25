@@ -10,7 +10,7 @@
         android:id="@+id/etSearchQuery"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Search GitHub users..."
+        android:hint="Search username here..."
         android:inputType="text"
         app:layout_constraintEnd_toStartOf="@id/btSearch"
         app:layout_constraintStart_toStartOf="parent"

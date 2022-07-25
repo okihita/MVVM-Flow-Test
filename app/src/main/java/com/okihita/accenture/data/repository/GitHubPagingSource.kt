@@ -19,8 +19,6 @@ class GitHubPagingSource(
 
         val remotePageToLoad = params.key ?: GITHUB_STARTING_PAGE_INDEX
 
-        println("requesting page $remotePageToLoad of $searchQuery with param type ${params::class.java.simpleName}.")
-
         return try {
 
             val response = api.getUsers(searchQuery, params.loadSize, remotePageToLoad)

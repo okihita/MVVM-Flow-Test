@@ -10,7 +10,8 @@ fun Throwable.toUserFriendlyErrorMessage(): String {
         is HttpException -> {
             when (this.code()) {
                 403 -> "API rate limit reached."
-                else -> "Error loading data. HTTP error code ${code()}"
+                422 -> "Enter a valid search query."
+                else -> "An HTTP error ${code()}"
             }
         }
 
@@ -21,11 +22,11 @@ fun Throwable.toUserFriendlyErrorMessage(): String {
 
         // If the internet was on, and hostname was resolved, but currently connection is cut
         is SocketTimeoutException -> {
-            "The server doesn't reply. Check again later."
+            "The server doesn't reply."
         }
 
         else -> {
-            "Unknown error. Try again later. Error type: ${this.javaClass.simpleName}"
+            "Unknown error of type: ${this.javaClass.simpleName}"
         }
     }
 }

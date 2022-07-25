@@ -5,10 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "user")
 data class GitHubUser(
-
-    @PrimaryKey(autoGenerate = true)
-    val rowId: Int = 0,
-
+    @PrimaryKey(autoGenerate = false)
     val id: Int,
     val login: String,
     val avatar_url: String,

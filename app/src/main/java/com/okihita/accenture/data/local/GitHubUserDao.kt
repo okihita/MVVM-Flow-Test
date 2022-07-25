@@ -10,12 +10,20 @@ import com.okihita.accenture.data.model.GitHubUser
 @Dao
 interface GitHubUserDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addUsers(users: List<GitHubUser>)
+    // Due to GitHub's search result nature which may have duplicate results on subsequent pages,
+    // calling OnConflictStrategy.REPLACE will cause the database to change and adapter to refresh,
+    // that will disturb user interface by having the adapter scrolled back.
+    // We will use OnConflictStrategy.IGNORE so avoid that refresh.
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(users: List<GitHubUser>)
 
     @Query("SELECT * FROM user")
     suspend fun getAllUsers(): List<GitHubUser>
 
-    @Query("SELECT * FROM user WHERE login LIKE :query")
-    fun pagingSource(query: String): PagingSource<Int, GitHubUser>
+    @Query(
+        "SELECT * FROM user " +
+                "INNER JOIN remote_key ON remote_key.id = user.id " +
+                "ORDER BY nextKey"
+    )
+    fun getAllUsersAsPagingSource(): PagingSource<Int, GitHubUser>
 }

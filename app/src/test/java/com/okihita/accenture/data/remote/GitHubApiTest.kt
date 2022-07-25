@@ -12,6 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -70,13 +71,24 @@ class GitHubApiTest {
     }
 
     @Test
-    fun getSearchResult_rateLimited_receivedError() = runBlocking {
+    fun getSearchResult_rateLimited_receivedError403() = runBlocking {
 
-        enqueueMockResponse("SearchRateLimitExceeded.json")
-        val response = gitHubApi.getUsers("rateLimited", 10, 1)
+        val mockResponse = MockResponse()
+            .setBody("Uh oh you triggered an 403 exception")
+            .setResponseCode(403)
 
-        assertThat(response).isNotNull()
-        assertThat(response.message).isNotNull()
+        server.enqueue(mockResponse)
+
+        try {
+            val response = gitHubApi.getUsers("rateLimited", 10, 1)
+            assertThat(response.users).hasSize(0)
+
+        } catch (e: Exception) {
+            assertThat(e).isInstanceOf(HttpException::class.java)
+
+            val errorCode = (e as HttpException).code()
+            assertThat(errorCode).isEqualTo(403)
+        }
     }
 
     @Test

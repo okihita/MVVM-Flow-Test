@@ -82,6 +82,8 @@ dependencies {
     // MockWebServer
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
 
     // Fragment Tests
     def fragment_version = "1.5.0"

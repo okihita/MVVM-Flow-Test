@@ -6,7 +6,7 @@ import com.okihita.accenture.data.model.GitHubUser
 
 @Database(
     entities = [GitHubUser::class, GitHubRemoteKey::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class GitHubUserDatabase : RoomDatabase() {

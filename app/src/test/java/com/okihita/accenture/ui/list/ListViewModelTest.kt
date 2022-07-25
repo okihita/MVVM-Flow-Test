@@ -2,8 +2,8 @@ package com.okihita.accenture.ui.list
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import com.google.common.truth.Truth.assertThat
@@ -11,6 +11,7 @@ import com.okihita.accenture.data.model.GitHubUser
 import com.okihita.accenture.data.repository.GitHubRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
@@ -22,8 +23,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
+@ExperimentalPagingApi
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
 class ListViewModelTest {
@@ -57,18 +58,18 @@ class ListViewModelTest {
     }
 
     @Test
-    fun viewModelCallsSearchUsers_repoCallsSearchUsers() = runTest {
+    fun viewModelCallsSearchUsers_searchQueryUpdated() = runTest {
 
-        val repository: GitHubRepository = mock()
-        val listVM = ListViewModel(repository)
+        val listVM = ListViewModel(mock())
 
-        // Use TestScope() in tests to replace viewModelScope
-        `when`(repository.getSearchResultFlow("hello"))
-            .thenReturn(flowOf(PagingData.from(generateUsers(0))).cachedIn(TestScope()))
-
-        listVM.searchUsers("hello")
+        listVM.updateSearchQuery("helloOne")
+        listVM.updateSearchQuery("helloTwo")
+        listVM.updateSearchQuery("helloThree")
+        listVM.updateSearchQuery("helloNine")
         advanceUntilIdle()
-        verify(repository).getSearchResultFlow("hello")
+
+        val searchQuery: MutableStateFlow<String> = listVM.searchQuery
+        assertThat(searchQuery.first()).isEqualTo("helloNine")
     }
 
     @Test
@@ -80,7 +81,7 @@ class ListViewModelTest {
         `when`(repository.getSearchResultFlow("hello"))
             .thenReturn(flowOf(PagingData.from(generateUsers(3))))
 
-        val result = listVM.searchUsers("hello").first()
+        listVM.updateSearchQuery("hello")
 
         val differ = AsyncPagingDataDiffer(
             diffCallback = MyDiffCallback(),
@@ -88,7 +89,7 @@ class ListViewModelTest {
             workerDispatcher = Dispatchers.Main
         )
 
-        differ.submitData(result)
+        differ.submitData(listVM.searchResultUsersFlow.first())
         advanceUntilIdle()
 
         assertThat(differ.snapshot().items).isEqualTo(generateUsers(3))

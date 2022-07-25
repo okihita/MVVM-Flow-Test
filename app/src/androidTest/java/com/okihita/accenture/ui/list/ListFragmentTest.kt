@@ -3,6 +3,7 @@ package com.okihita.accenture.ui.list
 import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.paging.ExperimentalPagingApi
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
@@ -21,7 +22,8 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.not
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -29,6 +31,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import javax.inject.Inject
 
+@ExperimentalPagingApi
 @ExperimentalCoroutinesApi
 @HiltAndroidTest
 @RunWith(AndroidJUnit4ClassRunner::class)
@@ -137,7 +140,7 @@ class ListFragmentTest {
     @Test
     fun test04b_onSearchResult_exactlyOneResult_showNoMoreResultInfo() {
 
-        val searchQuery = "okihita" // Only one user with this name
+        val searchQuery = "okihita" // Only one user with this login name
 
         // Searching a very specific username
         onView(withId(R.id.etSearchQuery))
@@ -162,7 +165,7 @@ class ListFragmentTest {
         IdlingRegistry.getInstance().register(networkIdlingResource)
 
         val searchQuery = "hello"
-        val helloUserId = 1836624
+        val helloUserId = 464330 // For the first user of the actual GitHub search result
 
         // Searching a common username
         onView(withId(R.id.etSearchQuery))
@@ -170,14 +173,11 @@ class ListFragmentTest {
         onView(withId(R.id.btSearch))
             .perform(click())
 
-        // The displayed RV should contain items with "hello" in it.
-        onView(withId(R.id.rvUsers))
+        onView(withId(R.id.rvUsers)) // The displayed RV should contain items with "hello" in it.
             .check(matches(hasDescendant(withText(searchQuery))))
-
-        onView(withId(R.id.rvUsers))
+        onView(withId(R.id.rvUsers)) // Click on the first child, top-most RV item
             .perform(actionOnItemAtPosition<GitHubUsersAdapter.GitHubUserVH>(0, click()))
-
-        verify(mockNavController)
+        verify(mockNavController) // Should be
             .navigate(ListFragmentDirections.actionListFragmentToDetailsFragment(helloUserId))
     }
 
@@ -193,33 +193,27 @@ class ListFragmentTest {
         onView(withId(R.id.btSearch))
             .perform(click())
 
-        // On original load, will fetch three pages, which is 30 users
-        // Since it's zero-index, we will want to scroll to item at position 29
+        // Scroll to item #8
         onView(withId(R.id.rvUsers))
             .perform(
                 actionOnItemAtPosition<GitHubUsersAdapter.GitHubUserVH>(
-                    PAGE_SIZE_PER_REQUEST * 3 - 1,
-                    scrollTo()
+                    PAGE_SIZE_PER_REQUEST - 1, scrollTo()
                 )
             )
 
-        // After waiting for network call, adapter should load another 10 items.
-        // Now item at position 39 should exist (previously it didn't)
+        // Scroll to item #17
         onView(withId(R.id.rvUsers))
             .perform(
                 actionOnItemAtPosition<GitHubUsersAdapter.GitHubUserVH>(
-                    PAGE_SIZE_PER_REQUEST * 4 - 1,
-                    scrollTo()
+                    PAGE_SIZE_PER_REQUEST * 2 - 3, scrollTo()
                 )
             )
 
-        // After waiting for network call, adapter should load another 10 items.
-        // Now item at position 49 should exist (previously it didn't)
+        // Scroll to item #25
         onView(withId(R.id.rvUsers))
             .perform(
                 actionOnItemAtPosition<GitHubUsersAdapter.GitHubUserVH>(
-                    PAGE_SIZE_PER_REQUEST * 5 - 1,
-                    scrollTo()
+                    PAGE_SIZE_PER_REQUEST * 3 - 5, scrollTo()
                 )
             )
     }
@@ -229,7 +223,7 @@ class ListFragmentTest {
 
         IdlingRegistry.getInstance().register(networkIdlingResource)
 
-        repeat(11) {
+        repeat(11) { // Rate limit (without auth) is 10 per minute
             onView(withId(R.id.etSearchQuery))
                 .perform(clearText(), typeText("nikita$it"), closeSoftKeyboard())
             onView(withId(R.id.btSearch))

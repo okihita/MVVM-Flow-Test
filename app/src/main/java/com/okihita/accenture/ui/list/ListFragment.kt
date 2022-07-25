@@ -7,15 +7,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import com.okihita.accenture.R
 import com.okihita.accenture.databinding.FragmentListBinding
 import com.okihita.accenture.util.ResultException
 import com.okihita.accenture.util.toUserFriendlyErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
+@ExperimentalPagingApi
 @AndroidEntryPoint
 class ListFragment : Fragment(R.layout.fragment_list) {
 
@@ -34,10 +38,8 @@ class ListFragment : Fragment(R.layout.fragment_list) {
             val navAction = ListFragmentDirections.actionListFragmentToDetailsFragment(it.id)
             findNavController().navigate(navAction)
         }
-
         val concatAdapter =
             usersAdapter.withLoadStateFooter(FooterLoadStateAdapter { usersAdapter.retry() })
-
         binding.rvUsers.adapter = concatAdapter
 
         binding.btSearch.setOnClickListener {
@@ -50,47 +52,46 @@ class ListFragment : Fragment(R.layout.fragment_list) {
                 }
                 binding.rvUsers.isVisible = false
             } else {
-                searchUser(searchQuery)
+                listVM.updateSearchQuery(searchQuery)
             }
         }
 
+        setupLoadStateHandler()
+        setupObserver()
+    }
+
+    private fun setupLoadStateHandler() {
         viewLifecycleOwner.lifecycleScope.launch {
             usersAdapter.loadStateFlow.collectLatest {
 
-                it.refresh.let { refresh ->
+                it.mediator?.refresh?.let { refresh ->
+                    setupRefreshLoadStateHandler(refresh)
+                }
+                setupRefreshLoadStateHandler(it.refresh)
+            }
+        }
+    }
 
-                    binding.pbLoading.isVisible = refresh is LoadState.Loading
-                    binding.rvUsers.isVisible = refresh !is LoadState.Loading
-                    binding.tvError.isVisible = refresh is LoadState.Error
+    private fun setupRefreshLoadStateHandler(refresh: LoadState) {
+        binding.pbLoading.isVisible = refresh is LoadState.Loading
+        binding.rvUsers.isVisible = refresh !is LoadState.Loading
+        binding.tvError.isVisible = refresh is LoadState.Error
 
-
-                    if (refresh is LoadState.Error) {
-                        binding.rvUsers.isVisible = false
-                        when (refresh.error) {
-                            is ResultException.EmptyResultException ->
-                                binding.tvError.text = getString(R.string.listFragment_emptyResult)
-                            else -> {
-                                binding.tvError.text = refresh.error.toUserFriendlyErrorMessage()
-                            }
-                        }
-                    }
+        if (refresh is LoadState.Error) {
+            binding.rvUsers.isVisible = false
+            when (refresh.error) {
+                is ResultException.EmptyResultException ->
+                    binding.tvError.text = getString(R.string.listFragment_emptyResult)
+                else -> {
+                    binding.tvError.text = refresh.error.toUserFriendlyErrorMessage()
                 }
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        // On resume, the state and content of EditText will be restored. Use it to search.
-        binding.etSearchQuery.text.toString().let {
-            if (it.isNotBlank()) searchUser(it)
-        }
-    }
-
-    private fun searchUser(searchQuery: String) {
-        lifecycleScope.launch {
-            listVM.searchUsers(searchQuery).collectLatest {
+    private fun setupObserver() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            listVM.searchResultUsersFlow.collectLatest {
                 usersAdapter.submitData(it)
             }
         }
