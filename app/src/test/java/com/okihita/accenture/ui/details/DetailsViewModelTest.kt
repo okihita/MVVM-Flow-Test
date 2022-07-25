@@ -46,7 +46,12 @@ class DetailsViewModelTest {
 
     @Test
     fun viewModelCallsGetUserById_liveDataRetrieved() = runTest {
-        val mockUser = GitHubUser(1000, "hello1000", "avatar", "gravatar")
+        val mockUser = GitHubUser(
+            id = 1000,
+            login = "hello1000",
+            avatar_url = "avatar",
+            gravatar_id = "gravatar"
+        )
 
         `when`(mockApi.getUserById(1000))
             .thenReturn(mockUser)

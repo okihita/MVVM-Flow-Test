@@ -30,7 +30,14 @@ class GitHubPagingSourceTest {
     private fun generateUsers(size: Int): List<GitHubUser> {
         val users = mutableListOf<GitHubUser>()
         (1..size).forEach {
-            users.add(GitHubUser(it, "hello$it", "avatar", "gravatar"))
+            users.add(
+                GitHubUser(
+                    id = it,
+                    login = "hello$it",
+                    avatar_url = "avatar",
+                    gravatar_id = "gravatar"
+                )
+            )
         }
         return users.toList()
     }
