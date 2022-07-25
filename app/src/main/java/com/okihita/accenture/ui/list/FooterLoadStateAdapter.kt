@@ -38,13 +38,16 @@ class FooterLoadStateAdapter(
 
                 loadState.let {
                     if (it is LoadState.Error) {
-                        if (it.error is ResultException.NoMoreResultException) {
-                            tvAppendError.text =
-                                root.context.getString(R.string.listFragment_noMoreResult)
-                        } else {
-                            tvAppendError.text =
-                                it.error.toUserFriendlyErrorMessage() + " Click here to retry."
-                            tvAppendError.setOnClickListener { retry() }
+                        when (it.error) {
+                            is ResultException.NoMoreResultException -> {
+                                tvAppendError.text =
+                                    root.context.getString(R.string.listFragment_noMoreResult)
+                            }
+                            else -> {
+                                tvAppendError.text =
+                                    it.error.toUserFriendlyErrorMessage() + " Click here to retry."
+                                tvAppendError.setOnClickListener { retry() }
+                            }
                         }
                     }
 

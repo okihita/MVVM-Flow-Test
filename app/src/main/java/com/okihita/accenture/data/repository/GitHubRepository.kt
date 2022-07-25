@@ -19,7 +19,12 @@ open class GitHubRepository @Inject constructor(
     open fun getSearchResultFlow(searchQuery: String): Flow<PagingData<GitHubUser>> {
 
         return Pager(
-            config = PagingConfig(PAGE_SIZE_PER_REQUEST, enablePlaceholders = false),
+            config = PagingConfig(
+                PAGE_SIZE_PER_REQUEST,
+                enablePlaceholders = false,
+                prefetchDistance = 2 * PAGE_SIZE_PER_REQUEST,
+                initialLoadSize = 5 * PAGE_SIZE_PER_REQUEST
+            ),
             remoteMediator = GitHubUserRemoteMediator(searchQuery, api, database),
             pagingSourceFactory = { database.userDao.getAllUsersAsPagingSource() }
         ).flow

@@ -38,10 +38,12 @@ class GitHubUserRemoteMediator(
                 LoadType.APPEND -> {
 
                     val lastUserLoaded = state.lastItemOrNull()
+                    println("last user loaded: $lastUserLoaded")
                     if (lastUserLoaded == null) { // No item in RV, then the REFRESH result was empty
                         return MediatorResult.Success(endOfPaginationReached = true)
                     } else {
-                        val nextKey: Int? = remoteKeyDao.getKeyById(lastUserLoaded.id).nextKey
+                        val nextKey: Int? = remoteKeyDao.getKeyById(lastUserLoaded.id)?.nextKey
+                        println("next key: $nextKey")
                         nextKey ?: return MediatorResult.Success(endOfPaginationReached = true)
                     }
                 }
@@ -80,6 +82,7 @@ class GitHubUserRemoteMediator(
         } catch (exception: IOException) {
             MediatorResult.Error(exception)
         } catch (exception: Exception) {
+            exception.printStackTrace()
             MediatorResult.Error(exception)
         }
     }

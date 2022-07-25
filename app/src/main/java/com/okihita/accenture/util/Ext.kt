@@ -26,7 +26,7 @@ fun Throwable.toUserFriendlyErrorMessage(): String {
         }
 
         else -> {
-            "Unknown error of type: ${this.javaClass.simpleName}"
+            "Unknown error."
         }
     }
 }
