@@ -39,7 +39,7 @@ class DetailsViewModelTest {
 
     @Test
     fun viewModelCallsGetUserById_apiClientCallsMethod() = runTest {
-        detailsVM.getProfile(1000)
+        detailsVM.getUserDetails(1000)
         advanceUntilIdle()
         verify(mockApi).getUserById(1000)
     }
@@ -56,7 +56,7 @@ class DetailsViewModelTest {
         `when`(mockApi.getUserById(1000))
             .thenReturn(mockUser)
 
-        detailsVM.getProfile(1000)
+        detailsVM.getUserDetails(1000)
         advanceUntilIdle()
 
         assertThat(detailsVM.user.value).isEqualTo(mockUser)

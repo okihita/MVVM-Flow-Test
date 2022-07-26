@@ -1,28 +1,19 @@
 package com.okihita.accenture.ui.details
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.okihita.accenture.data.model.GitHubUser
-import com.okihita.accenture.data.remote.GitHubApi
+import androidx.paging.ExperimentalPagingApi
+import com.okihita.accenture.data.model.GitHubUserDetails
+import com.okihita.accenture.data.repository.GitHubRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+@ExperimentalPagingApi
 @HiltViewModel
-class DetailsViewModel @Inject constructor(private val api: GitHubApi) : ViewModel() {
+class DetailsViewModel @Inject constructor(private val repository: GitHubRepository) : ViewModel() {
 
-    private val _user = MutableLiveData<GitHubUser>()
-    val user: LiveData<GitHubUser> = _user
-
-    fun getProfile(userId: Int) {
-        viewModelScope.launch {
-            try {
-                _user.value = api.getUserById(userId)
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-            }
-        }
-    }
+    suspend fun getUserDetails(userId: Int): Flow<Result<GitHubUserDetails>> =
+        repository.getUserDetails(userId).stateIn(viewModelScope)
 }

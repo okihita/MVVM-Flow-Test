@@ -1,6 +1,6 @@
 package com.okihita.accenture.data.remote
 
-import com.okihita.accenture.data.model.GitHubUser
+import com.okihita.accenture.data.model.GitHubUserDetails
 import com.okihita.accenture.data.model.GitHubUserSearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -18,5 +18,5 @@ interface GitHubApi {
     @GET("user/{userId}")
     suspend fun getUserById(
         @Path("userId") userId: Int,
-    ): GitHubUser
+    ): GitHubUserDetails
 }

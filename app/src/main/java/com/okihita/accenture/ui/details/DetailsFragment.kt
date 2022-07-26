@@ -4,11 +4,16 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.paging.ExperimentalPagingApi
+import coil.load
 import com.okihita.accenture.R
 import com.okihita.accenture.databinding.FragmentDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
+@ExperimentalPagingApi
 @AndroidEntryPoint
 class DetailsFragment : Fragment(R.layout.fragment_details) {
 
@@ -22,13 +27,22 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentDetailsBinding.bind(view)
 
-        binding.tvDetails.text = args.userId.toString()
+        val userId = args.userId // from the Navigation Arguments
 
-        detailsVM.user.observe(viewLifecycleOwner) { user ->
-            binding.tvDetails.text = user.login
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            detailsVM.getUserDetails(userId).collectLatest { result ->
+                try {
+                    val user = result.getOrThrow()
+                    binding.apply {
+                        tvUsername.text = user.name
+                        tvBio.text = user.bio
+                        ivAvatar.load(user.avatar_url)
+                    }
+                } catch (exception: Exception) {
+                    binding.tvUsername.text = exception.message
+                }
+            }
         }
-
-        detailsVM.getProfile(args.userId)
     }
 
     override fun onDestroyView() {
