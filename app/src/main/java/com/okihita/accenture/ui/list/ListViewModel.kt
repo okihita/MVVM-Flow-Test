@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -19,13 +20,18 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor(private val repository: GitHubRepository) : ViewModel() {
 
-    var searchQuery: MutableStateFlow<String> = MutableStateFlow("")
+    var searchQuery: MutableStateFlow<String> = MutableStateFlow(INITIAL_SEARCH_QUERY)
 
     val searchResultUsersFlow: Flow<PagingData<GitHubUser>> = searchQuery.flatMapLatest {
-        repository.getSearchResultFlow(searchQuery.value)
+        if (it.isNotBlank()) repository.getSearchResultFlow(searchQuery.value)
+        else flowOf(PagingData.from(listOf<GitHubUser>()))
     }.cachedIn(viewModelScope)
 
     fun updateSearchQuery(newQuery: String) {
         searchQuery.value = newQuery
+    }
+
+    companion object {
+        const val INITIAL_SEARCH_QUERY = ""
     }
 }

@@ -128,6 +128,8 @@ class ListFragmentTest {
         onView(withId(R.id.pbLoading)) // Make sure progress bar is not displayed
             .check(matches(not(isDisplayed())))
 
+        Thread.sleep(1000)
+
         // At least 5 items should be shown on screen, for a common search query
         // WARNING: This is a flaky test. May fail when the screen can't contain the RV items.
         onView(withId(R.id.rvUsers))
@@ -156,7 +158,6 @@ class ListFragmentTest {
         // "No more search result" error message is shown
         onView(withId(R.id.tvAppendError))
             .check(matches(withText(containsString(context.getString(R.string.listFragment_noMoreResult)))))
-
     }
 
     @Test
@@ -201,6 +202,8 @@ class ListFragmentTest {
                 )
             )
 
+        Thread.sleep(1_000) // Because Espresso can't handle progressBar animation correctly
+
         // Scroll to item #17
         onView(withId(R.id.rvUsers))
             .perform(
@@ -208,6 +211,8 @@ class ListFragmentTest {
                     PAGE_SIZE_PER_REQUEST * 2 - 3, scrollTo()
                 )
             )
+
+        Thread.sleep(1_000) // Because Espresso can't handle progressBar animation correctly
 
         // Scroll to item #25
         onView(withId(R.id.rvUsers))
