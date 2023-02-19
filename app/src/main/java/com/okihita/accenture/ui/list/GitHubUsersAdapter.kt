@@ -13,37 +13,27 @@ class GitHubUsersAdapter(
     val onItemClick: (GitHubUser) -> Unit
 ) : PagingDataAdapter<GitHubUser, GitHubUsersAdapter.GitHubUserVH>(UserComparator) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GitHubUserVH {
-        val view = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return GitHubUserVH(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = GitHubUserVH(
+        ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    )
 
     override fun onBindViewHolder(holder: GitHubUserVH, position: Int) {
-        getItem(position)?.let { user ->
-            holder.bind(user)
-        }
+        getItem(position)?.let { holder.bind(it) }
     }
 
     inner class GitHubUserVH(private val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: GitHubUser) {
-            binding.tvUsername.text = user.login
-            binding.ivAvatar.load(user.avatar_url)
-
-            binding.root.setOnClickListener {
-                onItemClick(user)
-            }
+        fun bind(user: GitHubUser) = with(binding) {
+            tvUsername.text = user.login
+            ivAvatar.load(user.avatar_url)
+            root.setOnClickListener { onItemClick(user) }
         }
     }
 
     object UserComparator : DiffUtil.ItemCallback<GitHubUser>() {
-        override fun areItemsTheSame(oldItem: GitHubUser, newItem: GitHubUser): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(old: GitHubUser, new: GitHubUser) = old.id == new.id
 
-        override fun areContentsTheSame(oldItem: GitHubUser, newItem: GitHubUser): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(old: GitHubUser, new: GitHubUser) = old == new
     }
 }

@@ -10,7 +10,8 @@
         android:id="@+id/etSearchQuery"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Search username here..."
+        android:autofillHints="search username"
+        android:hint="@string/search_username_here"
         android:inputType="text"
         app:layout_constraintEnd_toStartOf="@id/btSearch"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +21,7 @@
         android:id="@+id/btSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Search"
+        android:text="@string/search"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

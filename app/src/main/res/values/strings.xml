@@ -3,4 +3,7 @@
     <string name="listFragment_blankQuery">Enter search query before clicking search button</string>
     <string name="listFragment_emptyResult">There is no user with this username</string>
     <string name="listFragment_noMoreResult">That\'s the end of the result</string>
+    <string name="loading_user_details">Loading user details...</string>
+    <string name="search_username_here">Search username here...</string>
+    <string name="search">Search</string>
 </resources>
